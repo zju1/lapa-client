@@ -1,18 +1,19 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowLeft, Filter, Search } from "lucide-react"
+import { ArrowLeft, Search, SlidersHorizontal, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import PetCard from "@/components/pet-card"
 import Link from "next/link"
 import CustomSelect from "@/components/custom-select"
+import { cn } from "@/lib/utils"
 
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [petType, setPetType] = useState("")
   const [location, setLocation] = useState("")
+  const [showFilters, setShowFilters] = useState(false)
 
-  // Mock data for pets
   const pets = [
     {
       id: "1",
@@ -70,66 +71,133 @@ export default function SearchPage() {
     { value: "seattle", label: "Seattle" },
   ]
 
+  const activeFiltersCount = [petType, location].filter(Boolean).length
+
   return (
-    <main className="pb-16">
-      <header className="sticky top-0 z-10 bg-white border-b border-gray-200">
-        <div className="flex items-center p-4">
+    <main className="min-h-screen">
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border">
+        <div className="flex items-center gap-3 px-4 py-3">
           <Link href="/">
-            <Button variant="ghost" size="icon" className="mr-2">
+            <Button variant="ghost" size="icon" className="shrink-0 rounded-full">
               <ArrowLeft className="h-5 w-5" />
               <span className="sr-only">Back</span>
             </Button>
           </Link>
-          <h1 className="text-lg font-semibold">Search</h1>
-        </div>
-        <div className="px-4 pb-4">
-          <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+
+          {/* Search Input */}
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search for pets..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD465]"
+              placeholder="Search pets, breeds..."
+              className="w-full h-10 pl-10 pr-4 bg-muted/50 border border-border rounded-xl text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Pet Type</label>
-              <CustomSelect
-                options={petTypeOptions}
-                placeholder="Select pet type"
-                value={petType}
-                onChange={setPetType}
-              />
+          {/* Filter Toggle */}
+          <Button
+            variant={showFilters ? "default" : "outline"}
+            size="icon"
+            className="shrink-0 rounded-full relative"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            {activeFiltersCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-primary-foreground text-2xs rounded-full flex items-center justify-center">
+                {activeFiltersCount}
+              </span>
+            )}
+          </Button>
+        </div>
+
+        {/* Filters Panel */}
+        <div
+          className={cn(
+            "overflow-hidden transition-all duration-300",
+            showFilters ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
+          )}
+        >
+          <div className="px-4 pb-4 space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">
+                  Pet Type
+                </label>
+                <CustomSelect
+                  options={petTypeOptions}
+                  placeholder="All types"
+                  value={petType}
+                  onChange={setPetType}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">
+                  Location
+                </label>
+                <CustomSelect
+                  options={locationOptions}
+                  placeholder="All locations"
+                  value={location}
+                  onChange={setLocation}
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-              <CustomSelect
-                options={locationOptions}
-                placeholder="Select location"
-                value={location}
-                onChange={setLocation}
-              />
-            </div>
+
+            {activeFiltersCount > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs text-muted-foreground"
+                onClick={() => {
+                  setPetType("")
+                  setLocation("")
+                }}
+              >
+                <X className="h-3 w-3 mr-1" />
+                Clear filters
+              </Button>
+            )}
           </div>
         </div>
       </header>
 
-      <section className="p-4">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">Results</h2>
-          <Button variant="outline" size="sm" className="text-xs">
-            <Filter className="h-3 w-3 mr-1" />
-            Filters
-          </Button>
+      {/* Results */}
+      <section className="px-4 py-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">Results</h2>
+            <p className="text-sm text-muted-foreground">
+              {pets.length} pets found
+            </p>
+          </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          {pets.map((pet) => (
-            <PetCard key={pet.id} {...pet} />
+
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          {pets.map((pet, index) => (
+            <div
+              key={pet.id}
+              className="animate-fade-in"
+              style={{ animationDelay: `${index * 0.05}s` }}
+            >
+              <PetCard {...pet} />
+            </div>
           ))}
         </div>
+
+        {pets.length === 0 && (
+          <div className="text-center py-16">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+              <Search className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">No results found</h3>
+            <p className="text-muted-foreground text-sm">
+              Try adjusting your search or filters
+            </p>
+          </div>
+        )}
       </section>
     </main>
   )

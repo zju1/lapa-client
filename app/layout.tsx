@@ -1,16 +1,27 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import BottomNavbar from "@/components/bottom-navbar"
 import { ThemeProvider } from "@/components/theme-provider"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+})
 
 export const metadata: Metadata = {
-  title: "PetPals - Buy & Sell Pets",
-  description: "A marketplace for pet lovers to buy and sell pets",
-    generator: 'v0.dev'
+  title: "PetPals - Find Your Perfect Pet",
+  description: "A modern marketplace for pet lovers to find and adopt their perfect companion",
+}
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: "#ffffff",
 }
 
 export default function RootLayout({
@@ -19,16 +30,20 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} pb-16`}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          {children}
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <body className="font-sans antialiased">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div className="min-h-screen bg-background pb-20">
+            {children}
+          </div>
           <BottomNavbar />
         </ThemeProvider>
       </body>
     </html>
   )
 }
-
-
-import './globals.css'

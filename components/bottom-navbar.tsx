@@ -3,40 +3,78 @@
 import { Heart, Home, Plus, Search, User } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { cn } from "@/lib/utils"
+
+const navItems = [
+  { href: "/", icon: Home, label: "Home" },
+  { href: "/search", icon: Search, label: "Search" },
+  { href: "/post", icon: Plus, label: "Post", isAction: true },
+  { href: "/favorites", icon: Heart, label: "Favorites" },
+  { href: "/profile", icon: User, label: "Profile" },
+]
 
 export default function BottomNavbar() {
   const pathname = usePathname()
 
-  const isActive = (path: string) => {
-    return pathname === path
-  }
-
   return (
-    <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-white border-t border-gray-200">
-      <div className="grid h-full max-w-lg grid-cols-5 mx-auto">
-        <Link href="/" className="inline-flex flex-col items-center justify-center px-5">
-          <Home className={`w-6 h-6 mb-1 ${isActive("/") ? "text-[#FFD465]" : "text-gray-500"}`} />
-          <span className={`text-xs ${isActive("/") ? "text-[#FFD465]" : "text-gray-500"}`}>Home</span>
-        </Link>
-        <Link href="/search" className="inline-flex flex-col items-center justify-center px-5">
-          <Search className={`w-6 h-6 mb-1 ${isActive("/search") ? "text-[#FFD465]" : "text-gray-500"}`} />
-          <span className={`text-xs ${isActive("/search") ? "text-[#FFD465]" : "text-gray-500"}`}>Search</span>
-        </Link>
-        <Link href="/post" className="inline-flex flex-col items-center justify-center px-5">
-          <div className="flex items-center justify-center w-10 h-10 bg-[#FFD465] rounded-full -mt-5">
-            <Plus className="w-6 h-6 text-white" />
-          </div>
-          <span className={`text-xs mt-1 ${isActive("/post") ? "text-[#FFD465]" : "text-gray-500"}`}>Post</span>
-        </Link>
-        <Link href="/favorites" className="inline-flex flex-col items-center justify-center px-5">
-          <Heart className={`w-6 h-6 mb-1 ${isActive("/favorites") ? "text-[#FFD465]" : "text-gray-500"}`} />
-          <span className={`text-xs ${isActive("/favorites") ? "text-[#FFD465]" : "text-gray-500"}`}>Favorites</span>
-        </Link>
-        <Link href="/profile" className="inline-flex flex-col items-center justify-center px-5">
-          <User className={`w-6 h-6 mb-1 ${isActive("/profile") ? "text-[#FFD465]" : "text-gray-500"}`} />
-          <span className={`text-xs ${isActive("/profile") ? "text-[#FFD465]" : "text-gray-500"}`}>Profile</span>
-        </Link>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-lg border-t border-border safe-bottom">
+      <div className="max-w-lg mx-auto">
+        <div className="grid grid-cols-5 h-16">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href
+            const Icon = item.icon
+
+            if (item.isAction) {
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="flex flex-col items-center justify-center"
+                >
+                  <div
+                    className={cn(
+                      "flex items-center justify-center w-12 h-12 rounded-full -mt-4",
+                      "bg-primary text-primary-foreground shadow-lg",
+                      "transition-all duration-200",
+                      "hover:shadow-xl hover:scale-105",
+                      "active:scale-95"
+                    )}
+                  >
+                    <Icon className="w-5 h-5" strokeWidth={2.5} />
+                  </div>
+                </Link>
+              )
+            }
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-1 transition-colors",
+                  isActive
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Icon
+                  className={cn(
+                    "w-5 h-5 transition-transform",
+                    isActive && "scale-110"
+                  )}
+                  strokeWidth={isActive ? 2.5 : 2}
+                />
+                <span className={cn(
+                  "text-2xs font-medium",
+                  isActive && "font-semibold"
+                )}>
+                  {item.label}
+                </span>
+              </Link>
+            )
+          })}
+        </div>
       </div>
-    </div>
+    </nav>
   )
 }
