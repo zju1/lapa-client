@@ -2,7 +2,7 @@ import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import BottomNavbar from "@/components/bottom-navbar"
+import Navigation from "@/components/navigation"
 import { ThemeProvider } from "@/components/theme-provider"
 
 const inter = Inter({
@@ -12,8 +12,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "PetPals - Find Your Perfect Pet",
-  description: "A modern marketplace for pet lovers to find and adopt their perfect companion",
+  title: "Pawfect - Pet Marketplace",
+  description: "Find your perfect companion. Buy, sell, and adopt pets from trusted sellers.",
 }
 
 export const viewport: Viewport = {
@@ -21,7 +21,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#ffffff",
+  themeColor: "#E8704F",
 }
 
 export default function RootLayout({
@@ -31,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
-      <body className="font-sans antialiased">
+      <body className="font-sans">
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
@@ -41,7 +41,7 @@ export default function RootLayout({
           <div className="min-h-screen bg-background pb-20">
             {children}
           </div>
-          <BottomNavbar />
+          <Navigation />
         </ThemeProvider>
       </body>
     </html>
