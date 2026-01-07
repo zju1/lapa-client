@@ -1,14 +1,14 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
-import { ArrowLeft, Camera } from "lucide-react"
+import { ArrowLeft, Camera, ImagePlus, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import Link from "next/link"
 import CustomSelect from "@/components/custom-select"
+import { cn } from "@/lib/utils"
 
 export default function PostPage() {
   const [petName, setPetName] = useState("")
@@ -18,6 +18,7 @@ export default function PostPage() {
   const [price, setPrice] = useState("")
   const [location, setLocation] = useState("")
   const [description, setDescription] = useState("")
+  const [images, setImages] = useState<string[]>([])
 
   const petTypeOptions = [
     { value: "dog", label: "Dog" },
@@ -39,7 +40,6 @@ export default function PostPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission
     console.log({
       petName,
       petType,
@@ -48,102 +48,164 @@ export default function PostPage() {
       price,
       location,
       description,
+      images,
     })
   }
 
   return (
-    <main className="pb-16">
-      <header className="sticky top-0 z-10 bg-white border-b border-gray-200">
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center">
+    <main className="min-h-screen">
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border">
+        <div className="flex items-center justify-between px-4 py-4">
+          <div className="flex items-center gap-3">
             <Link href="/">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="rounded-full">
                 <ArrowLeft className="h-5 w-5" />
                 <span className="sr-only">Back</span>
               </Button>
             </Link>
-            <h1 className="text-lg font-semibold">Post a Pet</h1>
+            <div>
+              <h1 className="text-lg font-semibold">Post a Pet</h1>
+              <p className="text-xs text-muted-foreground">
+                Create your listing
+              </p>
+            </div>
           </div>
         </div>
       </header>
 
-      <form onSubmit={handleSubmit} className="p-4 space-y-6">
-        <div className="flex justify-center">
-          <div className="relative w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
-            <div className="text-center">
-              <Camera className="mx-auto h-10 w-10 text-gray-400" />
-              <p className="mt-2 text-sm text-gray-500">Add pet photos</p>
-              <p className="text-xs text-gray-400">Up to 5 photos</p>
+      <form onSubmit={handleSubmit} className="px-4 py-6 space-y-6">
+        {/* Photo Upload */}
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-2">
+            Photos
+          </label>
+          <div className="grid grid-cols-3 gap-3">
+            {/* Main upload area */}
+            <div
+              className={cn(
+                "relative aspect-square rounded-xl overflow-hidden",
+                "bg-muted/50 border-2 border-dashed border-border",
+                "flex flex-col items-center justify-center cursor-pointer",
+                "hover:bg-muted/70 hover:border-primary/50 transition-all",
+                images.length === 0 && "col-span-3 aspect-video"
+              )}
+            >
+              <input
+                type="file"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                multiple
+                accept="image/*"
+              />
+              <div className="text-center p-4">
+                {images.length === 0 ? (
+                  <>
+                    <Camera className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
+                    <p className="text-sm font-medium text-foreground">
+                      Add photos
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Up to 5 photos
+                    </p>
+                  </>
+                ) : (
+                  <ImagePlus className="h-6 w-6 text-muted-foreground" />
+                )}
+              </div>
             </div>
-            <input
-              type="file"
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              multiple
-              accept="image/*"
-            />
+
+            {/* Preview slots */}
+            {images.map((img, index) => (
+              <div
+                key={index}
+                className="relative aspect-square rounded-xl overflow-hidden bg-muted"
+              >
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute top-1 right-1 h-6 w-6 bg-black/50 hover:bg-black/70 text-white rounded-full"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            ))}
           </div>
         </div>
 
+        {/* Form Fields */}
         <div className="space-y-4">
           <div>
-            <label htmlFor="petName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="petName" className="block text-sm font-medium text-foreground mb-1.5">
               Pet Name
             </label>
             <Input
               id="petName"
               value={petName}
               onChange={(e) => setPetName(e.target.value)}
-              placeholder="Enter pet name"
+              placeholder="e.g., Max"
               required
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Pet Type</label>
-            <CustomSelect
-              options={petTypeOptions}
-              placeholder="Select pet type"
-              value={petType}
-              onChange={setPetType}
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1.5">
+                Pet Type
+              </label>
+              <CustomSelect
+                options={petTypeOptions}
+                placeholder="Select type"
+                value={petType}
+                onChange={setPetType}
+              />
+            </div>
+            <div>
+              <label htmlFor="breed" className="block text-sm font-medium text-foreground mb-1.5">
+                Breed
+              </label>
+              <Input
+                id="breed"
+                value={breed}
+                onChange={(e) => setBreed(e.target.value)}
+                placeholder="e.g., Golden Retriever"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label htmlFor="age" className="block text-sm font-medium text-foreground mb-1.5">
+                Age
+              </label>
+              <Input
+                id="age"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                placeholder="e.g., 2 years"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="price" className="block text-sm font-medium text-foreground mb-1.5">
+                Price ($)
+              </label>
+              <Input
+                id="price"
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="e.g., 500"
+                required
+              />
+            </div>
           </div>
 
           <div>
-            <label htmlFor="breed" className="block text-sm font-medium text-gray-700 mb-1">
-              Breed
+            <label className="block text-sm font-medium text-foreground mb-1.5">
+              Location
             </label>
-            <Input
-              id="breed"
-              value={breed}
-              onChange={(e) => setBreed(e.target.value)}
-              placeholder="Enter breed"
-              required
-            />
-          </div>
-
-          <div>
-            <label htmlFor="age" className="block text-sm font-medium text-gray-700 mb-1">
-              Age
-            </label>
-            <Input id="age" value={age} onChange={(e) => setAge(e.target.value)} placeholder="e.g., 2 years" required />
-          </div>
-
-          <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
-              Price ($)
-            </label>
-            <Input
-              id="price"
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="Enter price"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
             <CustomSelect
               options={locationOptions}
               placeholder="Select location"
@@ -153,23 +215,27 @@ export default function PostPage() {
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="description" className="block text-sm font-medium text-foreground mb-1.5">
               Description
             </label>
             <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe your pet..."
+              placeholder="Describe your pet, personality, habits..."
               rows={4}
+              className="resize-none"
               required
             />
           </div>
         </div>
 
-        <Button type="submit" className="w-full bg-[#FFD465] hover:bg-[#FFD465]/90 text-black">
-          Post Advertisement
-        </Button>
+        {/* Submit Button */}
+        <div className="pt-2">
+          <Button type="submit" size="xl" className="w-full">
+            Post Listing
+          </Button>
+        </div>
       </form>
     </main>
   )

@@ -1,11 +1,9 @@
-import Image from "next/image"
-import { Bell, Search } from "lucide-react"
+import { Bell, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import PetCard from "@/components/pet-card"
 import CategoryFilter from "@/components/category-filter"
 
 export default function Home() {
-  // Mock data for pets
   const pets = [
     {
       id: "1",
@@ -44,46 +42,95 @@ export default function Home() {
       location: "Miami",
       image: "/placeholder.svg?height=400&width=400",
     },
+    {
+      id: "5",
+      name: "Cooper",
+      breed: "Labrador",
+      age: "1 year",
+      price: 750,
+      location: "Seattle",
+      image: "/placeholder.svg?height=400&width=400",
+    },
+    {
+      id: "6",
+      name: "Milo",
+      breed: "British Shorthair",
+      age: "8 months",
+      price: 650,
+      location: "Boston",
+      image: "/placeholder.svg?height=400&width=400",
+    },
   ]
 
   return (
-    <main className="pb-16">
-      <header className="sticky top-0 z-10 bg-white border-b border-gray-200">
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center">
-            <Image
-              src="/placeholder.svg?height=40&width=40"
-              alt="PetPals Logo"
-              width={40}
-              height={40}
-              className="mr-2"
-            />
-            <h1 className="text-xl font-bold">PetPals</h1>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" className="rounded-full">
+    <main className="min-h-screen">
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border">
+        <div className="px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <span className="text-xl">🐾</span>
+              </div>
+              <div>
+                <h1 className="text-lg font-bold text-foreground">PetPals</h1>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <MapPin className="h-3 w-3" />
+                  <span>New York</span>
+                </div>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative rounded-full hover:bg-muted"
+            >
               <Bell className="h-5 w-5" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full" />
               <span className="sr-only">Notifications</span>
             </Button>
           </div>
         </div>
-        <div className="px-4 pb-2">
+
+        {/* Search Bar */}
+        <div className="px-4 pb-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search for pets..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD465]"
+              placeholder="Search for pets, breeds..."
+              className="w-full h-11 pl-4 pr-4 bg-muted/50 border border-border rounded-xl text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
             />
           </div>
         </div>
+
+        {/* Category Filter */}
         <CategoryFilter />
       </header>
 
-      <section className="p-4 grid grid-cols-2 gap-4">
-        {pets.map((pet) => (
-          <PetCard key={pet.id} {...pet} />
-        ))}
+      {/* Pet Grid */}
+      <section className="px-4 py-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">
+              Featured Pets
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              {pets.length} pets available
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          {pets.map((pet, index) => (
+            <div
+              key={pet.id}
+              className="animate-fade-in"
+              style={{ animationDelay: `${index * 0.05}s` }}
+            >
+              <PetCard {...pet} />
+            </div>
+          ))}
+        </div>
       </section>
     </main>
   )
